@@ -6,12 +6,72 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title>vue-spa-app</title>
+    <script src="https://unpkg.com/vue@2.5.17"></script>
+    <script src="https://unpkg.com/vue-router@3.0.0"></script>
   </head>
   <body>
-    <noscript>
-      <strong>We're sorry but vue-spa-app doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
-    <div id="app"></div>
-    <!-- built files will be auto injected -->
+    <div id="app">
+      <nav>
+        <router-link to="/">Top</router-link>
+        <router-link to="/users">User List</router-link>
+        <router-link to="/user/new?redirect=true">Create User</router-link>
+        <router-link to="/login" v-show="!auth.loggedIn()">Login</router-link>
+        <router-link to="/logout" v-show="auth.loggedIn()">LogOut</router-link>
+      </nav>
+      <router-view></router-view>
+    </div>
+    <script type="text/x-template" id="user-list">
+      <div>
+       <h1>User List</h1>
+       <div v-if="loading" class="loading">Loading....</div>
+       <div v-if="error" class="error">
+        <h1>{{ error }}</h1>
+       </div>
+       <div v-for="user in users" :key="user.id">
+        <h2>[{{user.id}}] {{ user.name }}</h2> 
+       </div>
+      </div>
+    </script>
+    <script type="text/x-template" id="user-detail">
+      <div>
+        <div class="detail-loading" v-if="loading">Loading...</div> 
+        <div class="detail-error" v-if="error">{{ error }}</div>
+        <div v-if="user">
+          <h2>{{ user.name }}</h2>
+          <p>{{ user.description }}</p>
+        </div>
+      </div> 
+    </script>
+    <script type="text/x-template" id="user-create">
+      <div>
+        <h2>Create User!!</h2>  
+        <div>
+          <label>Name: </label> 
+          <input type="text" v-model="user.name">
+        </div>
+        <div>
+          <label>Description: </label> 
+          <textarea v-model="user.description"></textarea>
+        </div>
+        <div v-if="error" class="error">{{ error }}</div>
+        <div>
+          <input type="button" v-on:click="createUser" value="Create!!">
+        </div>
+      </div> 
+    </script>
+    <script type="text/x-template" id="login">
+      <div>
+        <h2>Login</h2>  
+        <p v-if="$route.query.redirect">
+          Please Login!!
+        </p>
+        <form @submit.prevent="login">
+          <label><input v-model="email" placeholder="email"></label>
+          <label><input v-model="pass" placeholder="password" type="password"></label><br>
+          <button type="submit">LogIn</button>
+          <p v-if="error" class="error">Failed Login: Invalid email or password!!</p>
+        </form>
+      </div> 
+    </script>
   </body>
 </html>
